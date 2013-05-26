@@ -62,24 +62,36 @@ public class Interface implements ActionListener{
 	public void actionPerformed(ActionEvent evt){
 		if(newGame.equals(evt.getSource())){
 			if(verifyData()){
-				
-				//since verifyData returned true, 
-				//generate the mine field
+				System.out.println(height + " by " + width);
+				generateField();
+				grid.setVisible(true);
 			}
+		}
+		else if(evt.getSource() instanceof JButton){
+			System.out.println(evt.getActionCommand());
 		}
 	}
 	
 	/**
 	 * Is only called if verifyData() returns true
-	 * Creates the playing field, populates it with bombs
-	 * and sets the grid to visible again
-	 * 
-	 * ??? Move to other module that handles field creation
+	 * Add buttons to the grid panel
 	 * 
 	 * @param JPanel field
 	 */
-	public void generateField(JPanel field){
-		
+	public void generateField(){
+		mainFrame.remove(grid);
+		grid = new JPanel();
+		grid.setLayout(new GridLayout(height, width));
+		for(int i = 0; i < height; i++){
+			for(int j = 0; j < width; j++){
+				JButton temp = new JButton();
+				temp.setActionCommand(i+"/"+j);
+				temp.addActionListener(this);
+				grid.add(temp);
+			}
+		}
+		mainFrame.add(grid, BorderLayout.CENTER);
+		mainFrame.pack();
 	}
 	
 	/**
