@@ -30,6 +30,8 @@ public class Interface implements ActionListener{
 	int width  = 0;
 	int bombs  = 0;
 	
+	int[][] mineField;
+	
 	public void init(){
 		
 		grid.setVisible(false);
@@ -58,17 +60,29 @@ public class Interface implements ActionListener{
 		
 		newGame.addActionListener(this);	
 	}
-
+	
 	public void actionPerformed(ActionEvent evt){
+		//set mineField = array returned from MineLayer object
 		if(newGame.equals(evt.getSource())){
 			if(verifyData()){
+				mineField = new int[height][width];
 				System.out.println(height + " by " + width);
 				generateField();
 				grid.setVisible(true);
 			}
 		}
+		//if a button on the grid pressed, get its position from ActionCommand string
+		//disable the pressed button and give it text = to number in mineField array
+		//later need to check if game is over
 		else if(evt.getSource() instanceof JButton){
-			System.out.println(evt.getActionCommand());
+			String position = evt.getActionCommand();
+			System.out.println(position);
+			int row = Integer.parseInt(position.substring(0,position.indexOf("/")));
+			int col = Integer.parseInt(position.substring(position.indexOf("/")+1, position.length()));
+			System.out.println("row " + row + " col " + col);
+			JButton pressed = (JButton)evt.getSource();
+			pressed.setEnabled(false);
+			pressed.setText(Integer.toString(mineField[row][col]));
 		}
 	}
 	
