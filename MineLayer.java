@@ -117,41 +117,43 @@ public class MineLayer {
 	 * @param col - y coordinate value
 	 */
 	private void UpdateSurround(int row, int col) {
+		System.out.println(row + " " + col);
+		
 		// updates the 3 positions below the bomb
-					if(row - 1 >= 0) {
-						if(grid[row-1][col] < 9)
-							grid[row-1][col] = grid[row-1][col] + 1;
-						if(col - 1 >= 0) {
-							if(grid[row-1][col-1] < 9)
-							grid[row-1][col-1] = grid[row-1][col-1] + 1;
-						}
-						if(col + 1 < width) {
-							if(grid[row-1][col+1] < 9)
-							grid[row-1][col+1] = grid[row-1][col+1] + 1;
-						}
-					}
-					// updates the 3 positions above the bomb
-					if(row + 1 < height) {
-						if(grid[row+1][col] < 9)
-						grid[row-1][col] = grid[row-1][col] + 1;
-						if(col - 1 >= 0) {
-							if(grid[row+1][col-1] <9)
-							grid[row+1][col-1] = grid[row+1][col-1] + 1;
-						}
-						if(col + 1 < width) {
-							if(grid[row+1][col+1] < 9)
-							grid[row+1][col+1] = grid[row+1][col+1] + 1;
-						}
-					}
-					// updates position to the left
-					if(col - 1 >= 0) {
-						if(grid[row][col-1] < 9)
-						grid[row][col-1] = grid[row][col-1] + 1;
-					}
-					// updates position to the right
-					if(col + 1 < width) {
-						if(grid[row][col+1] < 9)
-						grid[row-1][col+1] = grid[row-1][col+1] + 1;
-					}
+		if(row - 1 >= 0) {
+			if(grid[row-1][col] < 9)
+				grid[row-1][col] = grid[row-1][col] + 1;
+			if(col - 1 >= 0) {
+				if(grid[row-1][col-1] < 9)
+					grid[row-1][col-1] = grid[row-1][col-1] + 1;
+			}
+			if(col + 1 < width) {
+				if(grid[row-1][col+1] < 9)
+					grid[row-1][col+1] = grid[row-1][col+1] + 1;
+			}
+		}
+		// updates the 3 positions above the bomb
+		if(row + 1 < height) {
+			if(grid[row+1][col] < 9)
+				grid[row+1][col] = grid[row+1][col] + 1;
+			if(col - 1 >= 0) {
+				if(grid[row+1][col-1] <9)
+					grid[row+1][col-1] = grid[row+1][col-1] + 1;
+			}
+			if(col + 1 < width) {
+				if(grid[row+1][col+1] < 9)
+					grid[row+1][col+1] = grid[row+1][col+1] + 1;
+			}
+		}
+		// updates position to the left
+		if(col - 1 >= 0) {
+			if(grid[row][col-1] < 9)
+				grid[row][col-1] = grid[row][col-1] + 1;
+		}
+		// updates position to the right
+		if(col + 1 < width) {
+			if(grid[row][col+1] < 9)
+				grid[row][col+1] = grid[row][col+1] + 1;
+		}
 	}
 }

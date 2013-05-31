@@ -25,12 +25,13 @@ public class Interface implements ActionListener{
 	JTextField gridHeight = new JTextField("10");
 	JTextField gridWidth  = new JTextField("10");
 	JTextField gridBombs  = new JTextField("25");
+	MineLayer  mLayer;
+	
+	boolean    gameOver   = false;
 	
 	int height = 0;
 	int width  = 0;
 	int bombs  = 0;
-	
-	int[][] mineField;
 	
 	public void init(){
 		
@@ -65,8 +66,8 @@ public class Interface implements ActionListener{
 		//set mineField = array returned from MineLayer object
 		if(newGame.equals(evt.getSource())){
 			if(verifyData()){
-				mineField = new int[height][width];
-				System.out.println(height + " by " + width);
+				mLayer = new MineLayer(height, width, bombs);
+				gameOver = false;
 				generateField();
 				grid.setVisible(true);
 			}
@@ -75,14 +76,24 @@ public class Interface implements ActionListener{
 		//disable the pressed button and give it text = to number in mineField array
 		//later need to check if game is over
 		else if(evt.getSource() instanceof JButton){
-			String position = evt.getActionCommand();
-			System.out.println(position);
-			int row = Integer.parseInt(position.substring(0,position.indexOf("/")));
-			int col = Integer.parseInt(position.substring(position.indexOf("/")+1, position.length()));
-			System.out.println("row " + row + " col " + col);
-			JButton pressed = (JButton)evt.getSource();
-			pressed.setEnabled(false);
-			pressed.setText(Integer.toString(mineField[row][col]));
+			if(!gameOver){
+				String position = evt.getActionCommand();
+				System.out.println(position);
+				int row = Integer.parseInt(position.substring(0,position.indexOf("/")));
+				int col = Integer.parseInt(position.substring(position.indexOf("/")+1, position.length()));
+				System.out.println("row " + row + " col " + col);
+				JButton pressed = (JButton)evt.getSource();
+				pressed.setEnabled(false);
+			
+				if(mLayer.IsBomb(row, col)){
+					messagePlayer("Game Over");
+					gameOver = true;
+					pressed.setText("*");
+				}
+				else{
+					pressed.setText(Integer.toString(mLayer.get(row,col)));
+				}
+			}
 		}
 	}
 	
