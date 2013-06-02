@@ -18,6 +18,7 @@ public class MineLayer {
 		this.height = height;
 		this.width = width;
 		grid = new int[height][width];
+		bomblocate = new int[bombs];
 		
 		Populate(bombs);
 	}
@@ -43,6 +44,10 @@ public class MineLayer {
 	 */
 	public int get(int xcord, int ycord) {
 		return grid[xcord][ycord];
+	}
+	
+	public int[] GetBombLocation() {
+		return bomblocate;
 	}
 	
 	/**
@@ -91,6 +96,7 @@ public class MineLayer {
 		for(int i = 0;i<bombs;i++) {
 			// randomly chooses a position to put a bomb in
 			randnumber = rnd.nextInt(coordinate.size());
+			bomblocate[i] = coordinate.get(randnumber);
 			row = coordinate.get(randnumber)/width;
 			col = coordinate.get(randnumber)%width;
 			grid[row][col] = 9;
@@ -107,6 +113,8 @@ public class MineLayer {
 	
 	// 2d array of the grid data
 	private int[][] grid;
+	// bomb locations
+	private int[] bomblocate;
 	private int height;
 	private int width;
 	
