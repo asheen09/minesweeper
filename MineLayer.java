@@ -117,7 +117,6 @@ public class MineLayer {
 	 * @param col - y coordinate value
 	 */
 	private void UpdateSurround(int row, int col) {
-		System.out.println(row + " " + col);
 		
 		// updates the 3 positions below the bomb
 		if(row - 1 >= 0) {
