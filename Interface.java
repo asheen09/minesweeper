@@ -32,6 +32,9 @@ public class Interface implements ActionListener{
 	int height = 0;
 	int width  = 0;
 	int bombs  = 0;
+	//hidden refers to the number of squares not revealed
+	//when hidden = bombs, player wins
+	int hidden = 0;
 	
 	public void init(){
 		
@@ -67,6 +70,7 @@ public class Interface implements ActionListener{
 		if(newGame.equals(evt.getSource())){
 			if(verifyData()){
 				mLayer = new MineLayer(height, width, bombs);
+				hidden = height*width;
 				gameOver = false;
 				generateField();
 				grid.setVisible(true);
@@ -78,20 +82,22 @@ public class Interface implements ActionListener{
 		else if(evt.getSource() instanceof JButton){
 			if(!gameOver){
 				String position = evt.getActionCommand();
-				System.out.println(position);
 				int row = Integer.parseInt(position.substring(0,position.indexOf("/")));
 				int col = Integer.parseInt(position.substring(position.indexOf("/")+1, position.length()));
-				System.out.println("row " + row + " col " + col);
 				JButton pressed = (JButton)evt.getSource();
-				pressed.setEnabled(false);
 			
 				if(mLayer.IsBomb(row, col)){
 					messagePlayer("Game Over");
 					gameOver = true;
 					pressed.setText("*");
+					pressed.setEnabled(false);
 				}
 				else{
-					pressed.setText(Integer.toString(mLayer.get(row,col)));
+					revealEmpty(row,col);
+					if(hidden == bombs){
+						messagePlayer("You Win!");
+						gameOver = true;
+					}
 				}
 			}
 		}
@@ -154,6 +160,59 @@ public class Interface implements ActionListener{
 	 */
 	public void messagePlayer(String message){
 		JOptionPane.showMessageDialog(null, message);
+	}
+	
+	/**
+	 * Used to recursively reveal empty space on the
+	 * (grid) mine field
+	 * 
+	 * @param row
+	 * @param col
+	 */
+	public void revealEmpty(int row, int col){
+		int north;
+		int south;
+		int east;
+		int west;
+		
+		if(mLayer.get(row,col) != 0){
+			JButton temp = (JButton)grid.getComponent(row*width+col);
+			temp.setText(Integer.toString(mLayer.get(row,col)));
+			temp.setEnabled(false);
+			hidden--;
+			return;
+		}
+		else{
+			JButton temp = (JButton)grid.getComponent(row*width+col);
+			temp.setText(Integer.toString(mLayer.get(row,col)));
+			temp.setEnabled(false);
+			hidden--;
+			
+			north = row*width+col - width;
+			south = row*width+col + width;
+			east  = row*width+col + 1;
+			west  = row*width+col - 1;
+		}
+		//Check north position
+		if(north >= 0 && grid.getComponent(north).isEnabled()){
+			revealEmpty(row-1,col);
+		}
+		if(south < height*width && grid.getComponent(south).isEnabled()){
+			revealEmpty(row+1,col);
+		}
+		//The check is done to prevent wrap around reveals
+		//i.e. Row 4 Col 0/10 does not wrap around to Row 3 Col 9/10
+		if(east < height*width && grid.getComponent(east).isEnabled()){
+			if(east/width == row){
+				revealEmpty(row,col+1);
+			}
+		}
+		if(west >= 0 && grid.getComponent(west).isEnabled()){
+			if(west/width == row){
+				revealEmpty(row,col-1);
+			}
+		}
+		return;
 	}
 	
 	public static void main(String args[]){	
