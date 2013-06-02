@@ -5,7 +5,10 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseAdapter;
 
+import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -118,6 +121,21 @@ public class Interface implements ActionListener{
 				JButton temp = new JButton();
 				temp.setActionCommand(i+"/"+j);
 				temp.addActionListener(this);
+				//Allows application of mine markers on buttons
+				temp.addMouseListener(new MouseAdapter() {
+				    public void mouseClicked(MouseEvent evt) {
+				    	if(evt.getButton() == MouseEvent.BUTTON3){
+				    		JButton flag = (JButton)evt.getSource();
+				    		if(flag.isEnabled() && !gameOver){
+				    			if(flag.getText().equals("")){
+				    				flag.setText("?");
+				    			}
+				    			else{
+				    				flag.setText("");
+				    			}
+				    		}
+				    	}
+				    }});
 				grid.add(temp);
 			}
 		}
