@@ -46,7 +46,7 @@ public class MineLayer {
 		return grid[xcord][ycord];
 	}
 	
-	public int[] GetBombLocation() {
+	public int[] getBombLocation() {
 		return bomblocate;
 	}
 	

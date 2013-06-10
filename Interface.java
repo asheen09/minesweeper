@@ -1,12 +1,14 @@
 package minesweeper;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
+import java.awt.Font;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -86,13 +88,12 @@ public class Interface implements ActionListener{
 				String position = evt.getActionCommand();
 				int row = Integer.parseInt(position.substring(0,position.indexOf("/")));
 				int col = Integer.parseInt(position.substring(position.indexOf("/")+1, position.length()));
-				JButton pressed = (JButton)evt.getSource();
+				//JButton pressed = (JButton)evt.getSource();
 			
 				if(mLayer.IsBomb(row, col)){
 					messagePlayer("Game Over");
 					gameOver = true;
-					pressed.setText("*");
-					pressed.setEnabled(false);
+					revealBombs();
 				}
 				else{
 					revealEmpty(row,col);
@@ -177,6 +178,22 @@ public class Interface implements ActionListener{
 	 */
 	public void messagePlayer(String message){
 		JOptionPane.showMessageDialog(null, message);
+	}
+	
+	/**
+	 * Called when the game is over to reveal all
+	 * bomb positions
+	 */
+	public void revealBombs(){
+		int[] bombs = mLayer.getBombLocation();
+		
+		for(int i = 0; i < bombs.length; i++){
+			JButton temp = (JButton)grid.getComponent(bombs[i]);
+			temp.setEnabled(false);
+			temp.setText("*");
+			temp.setFont(new Font("Dialog", Font.PLAIN, 30));
+			temp.setBackground(Color.RED);
+		}
 	}
 	
 	/**
