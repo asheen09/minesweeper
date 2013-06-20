@@ -23,15 +23,18 @@ public class Interface implements ActionListener{
 	JButton    newGame    = new JButton("New Game");
 	JPanel     grid       = new JPanel();
 	JPanel     settings   = new JPanel(new GridLayout(0,3));
+	JPanel     sweeper    = new JPanel(new BorderLayout());
+	JPanel     spells     = new JPanel();
 	JLabel     heightL    = new JLabel("Field Height");
 	JLabel     widthL     = new JLabel("Field Width");
-	JLabel     bombL      = new JLabel("Desired number of bombs");
+	JLabel     bombL      = new JLabel("Bomb Count");
 	JTextField gridHeight = new JTextField("10");
 	JTextField gridWidth  = new JTextField("10");
 	JTextField gridBombs  = new JTextField("25");
 	MineLayer  mLayer;
+	PlayerRes resources;
 	
-	boolean    gameOver   = false;
+	boolean    gameOver   = true;
 	
 	int height = 0;
 	int width  = 0;
@@ -43,6 +46,7 @@ public class Interface implements ActionListener{
 	public void init(){
 		
 		grid.setVisible(false);
+		resources = new PlayerRes(spells);
 		
 		// Settings Panel
 		settings.add(heightL);
@@ -57,12 +61,17 @@ public class Interface implements ActionListener{
 		settings.add(new JLabel());
 		settings.add(newGame);
 		
+		// Minesweeper Panel - for organization 
+		sweeper.add(grid, BorderLayout.CENTER);
+		sweeper.add(settings, BorderLayout.SOUTH);
+		
 		// Frame initialization
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainFrame.setResizable(false);
 		mainFrame.setLayout(new BorderLayout());
-		mainFrame.setPreferredSize(new Dimension(500,500));
-		mainFrame.add(grid, BorderLayout.CENTER);
-		mainFrame.add(settings, BorderLayout.SOUTH);
+		mainFrame.setPreferredSize(new Dimension(800,500));
+		mainFrame.add(sweeper, BorderLayout.CENTER);
+		mainFrame.add(spells, BorderLayout.WEST);
 		mainFrame.pack();
 		mainFrame.setVisible(true);
 		
@@ -70,7 +79,6 @@ public class Interface implements ActionListener{
 	}
 	
 	public void actionPerformed(ActionEvent evt){
-		//set mineField = array returned from MineLayer object
 		if(newGame.equals(evt.getSource())){
 			if(verifyData()){
 				mLayer = new MineLayer(height, width, bombs);
@@ -80,15 +88,14 @@ public class Interface implements ActionListener{
 				grid.setVisible(true);
 			}
 		}
+		//if game is not over, then check
 		//if a button on the grid pressed, get its position from ActionCommand string
 		//disable the pressed button and give it text = to number in mineField array
-		//later need to check if game is over
-		else if(evt.getSource() instanceof JButton){
-			if(!gameOver){
+		else if(!gameOver){
+			if(evt.getSource() instanceof JButton){
 				String position = evt.getActionCommand();
 				int row = Integer.parseInt(position.substring(0,position.indexOf("/")));
 				int col = Integer.parseInt(position.substring(position.indexOf("/")+1, position.length()));
-				//JButton pressed = (JButton)evt.getSource();
 			
 				if(mLayer.IsBomb(row, col)){
 					messagePlayer("Game Over");
@@ -113,7 +120,7 @@ public class Interface implements ActionListener{
 	 * @param JPanel field
 	 */
 	public void generateField(){
-		mainFrame.remove(grid);
+		sweeper.remove(grid);
 		grid = new JPanel();
 		grid.setLayout(new GridLayout(height, width));
 		for(int i = 0; i < height; i++){
@@ -139,7 +146,7 @@ public class Interface implements ActionListener{
 				grid.add(temp);
 			}
 		}
-		mainFrame.add(grid, BorderLayout.CENTER);
+		sweeper.add(grid, BorderLayout.CENTER);
 		mainFrame.pack();
 	}
 	
