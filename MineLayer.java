@@ -2,6 +2,7 @@ package minesweeper;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Date;
 
 public class MineLayer {
 	
@@ -24,15 +25,33 @@ public class MineLayer {
 	}
 	
 	/**
-	 * returns the current grid setup
+	 * returns a random free space on the board
+	 * if no free spaces are left then it returns a -1
 	 * 
-	 * ??? i think this is a bad use of object oriented programming
-	 * ??? try not to use this one
-	 * 
-	 * @return grid
+	 * @return
 	 */
-	public int[][] Get() {
-		return grid;
+	public int getFreeSpace() {
+		if(coordinate.size() == 0)
+			return -1;
+		int rnd = new Random(new Date().getTime()).nextInt(coordinate.size());
+		int value = coordinate.get(rnd);
+		coordinate.remove(rnd);
+		return value;
+	}
+	
+	/**
+	 * removes the given free space position from the array
+	 * list. If the position is not found, nothing is done.
+	 * 
+	 * @param position - position of free space
+	 */
+	public void removeFreeSpace(int position) {
+		for(int i = 0;i<coordinate.size();i++) {
+			if(coordinate.get(i) == position) {
+				coordinate.remove(i);
+				break;
+			}
+		}
 	}
 	
 	/**
@@ -88,7 +107,7 @@ public class MineLayer {
 		Random rnd = new Random();
 		
 		// array list of every position on grid
-		ArrayList<Integer> coordinate = new ArrayList<Integer>(height*width);
+		coordinate = new ArrayList<Integer>(height*width);
 		for(int i = 0;i<height*width;i++) {
 			coordinate.add(i);
 		}
@@ -106,8 +125,6 @@ public class MineLayer {
 			// removes the possible position from array list
 			coordinate.remove(randnumber);
 		}
-			// cleans the left over positions of the array list
-			coordinate.clear();
 	}
 	
 	
@@ -117,6 +134,7 @@ public class MineLayer {
 	private int[] bomblocate;
 	private int height;
 	private int width;
+	private ArrayList<Integer> coordinate;
 	
 	/**
 	 * only called when bomb is inserted onto grid
