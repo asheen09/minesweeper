@@ -227,6 +227,10 @@ public class PlayerRes implements MouseListener{
 			if(gained > 0){
 				spellInfo.append("Gained " + gained + " MP\n");
 			}
+			if(curOC.equals("Excavate")){
+				updateMP(-excavateC);
+				spellInfo.append("Excavation yielded nothing\n");
+			}
 		}
 		// Player discovers bomb and excavate was not prepped
 		// May need Minelayer to provide identification method given numbers
