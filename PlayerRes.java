@@ -179,14 +179,13 @@ public class PlayerRes implements MouseListener{
 	public int updateMP(int mp){
 		int gained = mp;
 		
-		if(curMP < maxMP){
-			curMP = curMP + mp;
-			if(curMP > maxMP){
-				gained = mp-(curMP-maxMP);
-				curMP = maxMP;
-			}
-			mpStat.setText("MP: " + curMP + " / " + maxMP);
+		curMP = curMP + mp;
+		
+		if(curMP > maxMP){
+			gained = mp-(curMP-maxMP);
+			curMP = maxMP;
 		}
+		mpStat.setText("MP: " + curMP + " / " + maxMP);
 		return gained;
 	}
 	
@@ -200,6 +199,7 @@ public class PlayerRes implements MouseListener{
 			hpStat.setText("HP: " + curHP + " / " + maxHP);
 			return -1;
 		}
+		// If damage was taken
 		else if(hp < 0){
 			hpStat.setText("HP: " + curHP + " / " + maxHP);
 			return 1;
