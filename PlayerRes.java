@@ -229,6 +229,7 @@ public class PlayerRes implements MouseListener{
 			}
 			if(curOC.equals("Excavate")){
 				updateMP(-excavateC);
+				updateOC(" ");
 				spellInfo.append("Excavation yielded nothing\n");
 			}
 		}
