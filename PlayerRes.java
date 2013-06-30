@@ -209,7 +209,7 @@ public class PlayerRes implements MouseListener{
 	}
 	
 	public void updateBombs(int b){
-		if(bombs < maxBombs){
+		if(bombs <= maxBombs){
 			bombs = bombs + b;
 			bombStrg.setText("Bombs: " + bombs + " / " + maxBombs);
 		}

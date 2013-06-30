@@ -86,6 +86,8 @@ public class Interface implements ActionListener{
 				gameOver = false;
 				generateField();
 				grid.setVisible(true);
+				resources.reset();
+				resources.setMSObjects(mLayer, grid);
 			}
 		}
 		//if game is not over, then check
@@ -97,18 +99,24 @@ public class Interface implements ActionListener{
 				int row = Integer.parseInt(position.substring(0,position.indexOf("/")));
 				int col = Integer.parseInt(position.substring(position.indexOf("/")+1, position.length()));
 			
-				if(mLayer.IsBomb(row, col)){
+				
+				reveal(row,col);
+				if(hidden == bombs){
+					messagePlayer("Only bombs remain");
+				}
+				
+				/*if(mLayer.IsBomb(row, col)){
 					messagePlayer("Game Over");
 					gameOver = true;
 					revealBombs();
 				}
 				else{
-					revealEmpty(row,col);
+					reveal(row,col);
 					if(hidden == bombs){
 						messagePlayer("You Win!");
 						gameOver = true;
 					}
-				}
+				}*/
 			}
 		}
 	}
@@ -210,23 +218,50 @@ public class Interface implements ActionListener{
 	 * @param row
 	 * @param col
 	 */
-	public void revealEmpty(int row, int col){
+	public void reveal(int row, int col){
 		int north;
 		int south;
 		int east;
 		int west;
+		int discovered = mLayer.get(row,col);
+		int result = resources.eventHandler(discovered);
 		
-		if(mLayer.get(row,col) != 0){
+		if(discovered != 0){
 			JButton temp = (JButton)grid.getComponent(row*width+col);
-			temp.setText(Integer.toString(mLayer.get(row,col)));
 			temp.setEnabled(false);
-			hidden--;
+			
+			// Player revealed a cell safely
+			// May need to use MineLayer identify method
+			if(result == 0){
+				if(discovered == 9){
+					temp.setText("$");
+					temp.setBackground(Color.GREEN);
+				}
+				else{
+					temp.setText(Integer.toString(discovered));
+					hidden--;
+					mLayer.removeFreeSpace(row*width+col);
+				}
+			}
+			// Player has taken damage 
+			else if(result > 0){
+				temp.setText("*");
+				temp.setFont(new Font("Dialog", Font.PLAIN, 30));
+				temp.setBackground(Color.RED);
+			}	
+			// Player's HP has run out
+			else{
+				gameOver = true;
+				messagePlayer("You dead!");
+				revealBombs();
+			}		
 			return;
 		}
 		else{
 			JButton temp = (JButton)grid.getComponent(row*width+col);
-			temp.setText(Integer.toString(mLayer.get(row,col)));
+			temp.setText(Integer.toString(discovered));
 			temp.setEnabled(false);
+			mLayer.removeFreeSpace(row*width+col);
 			hidden--;
 			
 			north = row*width+col - width;
@@ -236,21 +271,21 @@ public class Interface implements ActionListener{
 		}
 		//Check north position
 		if(north >= 0 && grid.getComponent(north).isEnabled()){
-			revealEmpty(row-1,col);
+			reveal(row-1,col);
 		}
 		if(south < height*width && grid.getComponent(south).isEnabled()){
-			revealEmpty(row+1,col);
+			reveal(row+1,col);
 		}
 		//The check is done to prevent wrap around reveals
 		//i.e. Row 4 Col 0/10 does not wrap around to Row 3 Col 9/10
 		if(east < height*width && grid.getComponent(east).isEnabled()){
 			if(east/width == row){
-				revealEmpty(row,col+1);
+				reveal(row,col+1);
 			}
 		}
 		if(west >= 0 && grid.getComponent(west).isEnabled()){
 			if(west/width == row){
-				revealEmpty(row,col-1);
+				reveal(row,col-1);
 			}
 		}
 		return;
