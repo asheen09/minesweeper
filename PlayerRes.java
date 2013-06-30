@@ -5,8 +5,6 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -27,20 +25,24 @@ public class PlayerRes implements MouseListener{
 	private int curMP = 30;
 	private int bombs = 0;
 	private int maxBombs = 5;
+	private int bombDmg = -10;
 	
-	private String      currOC    = new String("Excavate");
+	private String      curOC     = new String(" ");
 	private JButton     insight   = new JButton("Insight [" + insightC + "]");
 	private JButton     excavate  = new JButton("Excavate [" + excavateC + "]");
 	private JButton     consume   = new JButton("Consume");
-	private JButton     ocSpell   = new JButton(currOC);
+	private JButton     ocSpell   = new JButton(curOC);
 	private JLabel      bombStrg  = new JLabel("Bombs: " + bombs + " / " + maxBombs);
 	private JLabel      hpStat    = new JLabel("HP: " + curHP + " / " + maxHP);
 	private JLabel      mpStat    = new JLabel("MP: " + curMP + " / " + maxMP);
 	private JLabel      title     = new JLabel("Spell Book");
-	private JTextArea   spellInfo = new JTextArea("",5,20);
+	private JTextArea   spellInfo = new JTextArea("Mouse over spells for info\n",5,20);
 	private JScrollPane display   = new JScrollPane(spellInfo);
 	
 	GridBagConstraints c = new GridBagConstraints();
+	
+	private MineLayer mLayer;
+	private JPanel    grid;
 	
 	public PlayerRes(JPanel container){
 		setUpDisplay(container);
@@ -152,26 +154,149 @@ public class PlayerRes implements MouseListener{
 		consume.addMouseListener(this);
 	}
 	
+	public void setMSObjects(MineLayer ml, JPanel grid){
+		mLayer = ml;
+		this.grid = grid;
+	}
+	
+	// resets player's hp, mp, and bomb counter
+	public void reset(){
+		curHP = 30;
+		maxHP = 30;
+		curMP = 30;
+		maxMP = 50;
+		bombs = 0;
+		maxBombs = 5;
+		
+		spellInfo.setText("Mouse over spells for info\n");
+		
+		updateMP(0);
+		updateHP(0);
+		updateBombs(0);
+		updateOC(" ");
+	}
+	
+	public int updateMP(int mp){
+		int gained = mp;
+		
+		if(curMP < maxMP){
+			curMP = curMP + mp;
+			if(curMP > maxMP){
+				gained = mp-(curMP-maxMP);
+				curMP = maxMP;
+			}
+			mpStat.setText("MP: " + curMP + " / " + maxMP);
+		}
+		return gained;
+	}
+	
+	public int updateHP(int hp){
+		curHP = curHP + hp;
+		if(curHP > maxHP){
+			curHP = maxHP;
+		}
+		else if(curHP < 1){
+			curHP = 0;
+			hpStat.setText("HP: " + curHP + " / " + maxHP);
+			return -1;
+		}
+		else if(hp < 0){
+			hpStat.setText("HP: " + curHP + " / " + maxHP);
+			return 1;
+		}
+		hpStat.setText("HP: " + curHP + " / " + maxHP);
+		return 0;
+	}
+	
+	public void updateBombs(int b){
+		if(bombs < maxBombs){
+			bombs = bombs + b;
+			bombStrg.setText("Bombs: " + bombs + " / " + maxBombs);
+		}
+	}
+	
+	public void updateOC(String spell){
+		curOC = spell;
+		ocSpell.setText(spell);
+	}
+	
+	// Handles values discovered in minesweeper
+	public int eventHandler(int discovered){
+		if(discovered < 9){
+			int gained = updateMP(discovered);
+			if(gained > 0){
+				spellInfo.append("Gained " + gained + " MP\n");
+			}
+		}
+		// Player discovers bomb and excavate was not prepped
+		// May need Minelayer to provide identification method given numbers
+		// i.e. identify(discovered) returns out a string or int to represent bomb
+		else if(discovered > 8 && !curOC.equals("Excavate")){
+			spellInfo.setText("Bomb explodes: " + bombDmg + " HP\n");
+			return updateHP(bombDmg);
+		}
+		// Player discovers bomb and excavate was prepped
+		else{
+			if(discovered > 8 && curOC.equals("Excavate")){
+				// Not enough mp to cast excavate, player is damaged
+				if(curMP < excavateC){
+					spellInfo.setText("Not enough mana to excavate bomb\n");
+					updateOC(" ");
+					return updateHP(bombDmg);
+				}
+				else{
+					updateOC(" ");
+					updateMP(-excavateC);
+					updateHP(1);
+					updateBombs(1);
+					spellInfo.setText("Bomb has been safely excavated\n");
+				}
+			}
+		}
+		return 0;
+	}
+	
 	// Mouse event handler
 	public void mouseClicked(MouseEvent me) {
-		if(me.getSource().equals(ocSpell)){
-			currOC = " ";
-			ocSpell.setText(currOC);
-		}
 		if(me.getSource().equals(insight)){
-			
+			if(grid != null){
+				if(curMP < insightC){
+					spellInfo.setText("Insufficient MP to cast [Insight]");
+					return;
+				}
+				int pos = mLayer.getFreeSpace();
+				if(pos < 0){
+					spellInfo.setText("No free space to reveal");
+				}
+				else{
+					JButton temp = (JButton)grid.getComponent(pos);
+					temp.setText("(I)");
+					updateMP(-insightC);
+				}
+			}
 		}
-		if(me.getSource().equals(excavate)){
-			
+		else if(me.getSource().equals(ocSpell)){
+			updateOC(" ");
+		}
+		else if(me.getSource().equals(excavate)){
+			updateOC("Excavate");
+		}
+		else if(me.getSource().equals(consume)){
+			if(bombs > 0){
+				updateBombs(-1);
+				updateHP(5);
+				updateMP(2);
+				spellInfo.setText("Bomb granted 5 HP & 2 MP");
+			}
 		}
 	}
 	public void mouseEntered(MouseEvent me) {
 		if(me.getSource().equals(ocSpell)){
-			if(currOC.equals(" ")){
+			if(curOC.equals(" ")){
 				spellInfo.setText("No On-click spell is active");
 			}
 			else{
-				spellInfo.setText("Click to clear \"" + currOC + "\" from next click");
+				spellInfo.setText("Click to clear \"" + curOC + "\" from next click");
 			}
 		}
 		if(me.getSource().equals(insight)){
